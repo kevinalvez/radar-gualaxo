@@ -1,0 +1,15 @@
+# Radar Gualaxo - dependências
+#
+# Núcleo (core/, providers/, processors/, outputs/) + interface web
+# (interface_web/), necessário para rodar `python -m interface_web.app`:
+feedparser==6.0.12
+requests==2.34.2
+beautifulsoup4==4.15.0
+Flask==3.1.3
+APScheduler==3.11.3
+openpyxl==3.1.5
+
+# Opcional - só necessário se for rodar a interface desktop antiga
+# (interface_qt/, o padrão de `python main.py`). Não precisa instalar
+# numa máquina servidor que só vai rodar a interface web.
+# PySide6==6.11.1

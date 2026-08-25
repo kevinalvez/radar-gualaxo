@@ -1,0 +1,489 @@
+COMPARATIVO: c_monitor vs. clipping de referência
+Data do teste: 2026-08-07
+Keywords usadas (config/data/keywords.json): Vale, Rio Doce, Acordo Rio Doce,
+Fundação Renova, Bento Rodrigues, Mariana, Barragem de Fundão, Brasil
+
+METODOLOGIA
+-----------
+Nenhum dos 14 veículos abaixo está cadastrado em config/data/sources.json
+(que hoje só tem a fonte "Itatiaia"). Por isso este teste NÃO valida se o
+discovery do HTMLProvider encontraria essas matérias sozinho a partir da
+home de cada site — ele valida a camada de extração de conteúdo e
+casamento de keywords: para cada URL da lista, o link foi baixado
+diretamente e passado pelo mesmo pipeline que o app usa internamente
+(HTMLProvider._download -> HTMLCleaner.clean -> ContentExtractor.extract
+-> KeywordProcessor.process). Se essa camada funciona bem aqui, o
+discovery (que já foi calibrado em conversas anteriores) só precisa
+receber essas fontes cadastradas para o clipping funcionar de ponta a
+ponta.
+
+RESULTADO GERAL
+----------------
+16 de 16 itens tiveram a matéria correta extraída e pelo menos uma
+keyword configurada reconhecida no texto. 1 desses 16 (Atlas Público)
+só passou por coincidência, não por extração de conteúdo de verdade —
+ver observação específica abaixo.
+
+Durante o teste, um bug real de extração foi encontrado e corrigido no
+próprio ContentExtractor (providers/html/extractor.py) — ver seção
+"BUG ENCONTRADO E CORRIGIDO" ao final.
+
+
+DETALHE POR ITEM
+=================
+
+[Meio Ambiente, Ictiofauna e Possíveis Impactos]
+
+1. Cientistas identificam taxa recorde de deformações em peixes do ES
+   Veículo: Agência Brasil
+   Link: https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-08/cientistas-identificam-taxa-recorde-de-deformacoes-em-peixes-do-es
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Bento Rodrigues, Brasil, Mariana, Rio Doce
+   Observação: extração limpa, 4047 caracteres de conteúdo.
+
+2. Estudo identifica maior índice de deformações em peixes já registrado no Brasil após desastre de Mariana
+   Veículo: Diário da Guanabara
+   Link: https://dgrj.com.br/brasil/estudo-identifica-maior-indice-de-deformacoes-em-peixes-ja-registrado-no-brasil-apos-desastre-de-mariana
+   Status: OK (só depois da correção do bug de extração)
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: ANTES da correção, o extractor pegava um card de "matéria
+   relacionada" (outro assunto: "Sobrecarga de cuidados aumenta
+   vulnerabilidade de mulheres...") em vez do corpo real da notícia,
+   porque a página tem 13 tags <article> (o tema WordPress usa <article>
+   também para os cards de relacionados) e o seletor pegava a primeira,
+   que não era a matéria certa. Corrigido - ver seção de bug ao final.
+
+3. Como desastre em Mariana (MG) pode estar por trás de deformações recordes em peixes
+   Veículo: Jovem Pan
+   Link: https://jovempan.com.br/brasil/como-desastre-em-mariana-mg-pode-estar-por-tras-de-deformacoes-recordes-em-peixes/
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Bento Rodrigues, Brasil, Mariana, Rio Doce
+   Observação: extração limpa, 3037 caracteres.
+
+4. Peixes no ES apresentam recorde de deformações, alerta estudo
+   Veículo: Isto É
+   Link: https://istoe.com.br/deformacoes-peixes-espirito-santo-recorde-contaminacao
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: título extraído veio diferente do da lista de referência
+   ("Deformações em peixes no ES atingem taxa recorde, aponta pesquisa"),
+   provavelmente o site atualizou o título depois da publicação do
+   clipping de referência. Conteúdo e keywords batem normalmente.
+
+5. Litoral capixaba: estudo revela taxa recorde de deformidades em peixes após desastre
+   Veículo: Fato Paulista
+   Link: https://fatopaulista.com.br/deformidades-peixes-es-recorde-mariana/
+   Status: OK (só depois da correção do bug de extração)
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: mesmo bug do item 2. ANTES da correção, o extractor
+   pegava um card sobre "Descoberta de mineral raro em meteorito
+   marciano" (matéria completamente diferente, de outra editoria do
+   mesmo site). Corrigido.
+
+6. Peixes com deformações em número recorde são encontrados no ES
+   Veículo: BRA 1
+   Link: https://www.bra1.com.br/geral/id-675533/peixes_com_deformacoes_em_numero_recorde_sao_encontrados_no_es
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: extração limpa, 2884 caracteres.
+
+7. Estudo encontra deformações em 60,5% dos peixes analisados em litoral de estado Brasileiro
+   Veículo: Clic RDC
+   Link: https://clicrdc.com.br/meio-ambiente/estudo-encontra-deformacoes-em-605-dos-peixes-analisados-em-litoral-de-estado-brasileiro/
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana
+   Observação: não encontrou "Rio Doce" no texto (só as outras 3
+   keywords) - pode ser que a matéria realmente não cite "Rio Doce"
+   literalmente, focando em "Mariana"/"Barragem de Fundão". Não é falha
+   do sistema, é o texto real da matéria.
+
+8. Peixes apresentam deformações recordes no litoral do Espírito Santo
+   Veículo: Cenário MT
+   Link: https://cenariomt.com.br/mundo/peixes-apresentam-deformacoes-recordes-no-litoral-do-espirito-santo/
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: extração limpa, 3118 caracteres.
+
+9. Estudo registra taxa recorde de deformações em peixes do ES
+   Veículo: Últimas Notícias
+   Link: https://ultimasnoticias.inf.br/noticia/estudo-registra-taxa-recorde-de-deformacoes-em-peixes-do-es/
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana, Rio Doce
+   Observação: extração limpa, 3994 caracteres.
+
+10. Cientistas identificam taxa recorde de deformações em peixes do ES
+    Veículo: A Onça
+    Link: https://www.aonca.com.br/cientistas-identificam-taxa-recorde-de-deformacoes-em-peixes-do-es/
+    Status: OK (só depois da correção do bug de extração)
+    Keywords encontradas: Barragem de Fundão, Bento Rodrigues, Brasil, Mariana, Rio Doce
+    Observação: mesmo bug do item 2. ANTES da correção, o extractor
+    pegava um card sobre "Trens e metrô adiantam horário de pico no
+    Rio" (outra matéria, mesmo site). Corrigido.
+
+
+[Saúde das Populações Atingidas e Pesquisa Acadêmica]
+
+11. Ufes vai investigar saúde de atingidos pelo rompimento da barragem de Fundão
+    Veículo: Século Diário
+    Link: https://www.seculodiario.com.br/meio-ambiente/ufes-vai-investigar-saude-de-atingidos-pelo-rompimento-da-barragem-de-fundao/
+    Status: OK
+    Keywords encontradas: Barragem de Fundão, Fundação Renova, Mariana, Rio Doce
+    Observação: extração limpa, 6922 caracteres.
+
+
+[Articulação de Municípios e Ações Judiciais]
+
+12. Consórcio de municípios atingidos por barragem de Mariana tentam acordo para 23 cidades fora da repactuação
+    Veículo: O Fator
+    Link: https://ofator.com.br/informacao/municipios-atingidos-por-barragem-de-mariana-pedem-nova-mesa-de-negociacao-com-mineradoras-no-trf-6/
+    Status: OK
+    Keywords encontradas: Acordo Rio Doce, Barragem de Fundão, Bento Rodrigues, Brasil, Fundação Renova, Mariana, Rio Doce, Vale
+    Observação: matéria mais densa em keywords do lote - 8 das 8
+    configuradas aparecem no texto.
+
+13. Ex-Pogust Goodhead se reunirá com prefeitos afetados pela tragédia de Mariana
+    Veículo: O Brasilianista
+    Link: https://obrasilianista.com.br/camilalutfi/antigo-responsavel-pela-pogust-goodhead-fara-visita-ao-brasil/
+    Status: OK
+    Keywords encontradas: Barragem de Fundão, Brasil, Mariana
+    Observação: extração limpa, 4522 caracteres. Não cita "Rio Doce"
+    nem "Acordo Rio Doce" literalmente no texto extraído.
+
+
+[Projetos]
+
+14. Comitê do Rio Doce aprova quatro projetos de R$ 1,66 bilhão para bacia afetada pelo desastre de Mariana
+    Veículo: Atlas Público
+    Link: https://atlaspublico.com.br/noticias/comite-do-rio-doce-aprova-quatro-projetos-de-rs-1-66-bilhao-77656
+    Status: OK COM RESSALVA IMPORTANTE
+    Keywords encontradas: Mariana, Rio Doce
+    Observação: este site renderiza o conteúdo via JavaScript. Nosso
+    HTMLProvider só baixa HTML estático (biblioteca requests, sem
+    navegador headless), então o corpo real da matéria não chega a ser
+    baixado - o que foi extraído (119 caracteres) é só o título da
+    página repetido. O match só aconteceu porque o próprio título já
+    contém "Rio Doce" e "Mariana". Se o título não citasse a keyword
+    literalmente, essa matéria teria sido perdida (menos de 100
+    caracteres reais de conteúdo). Isso é uma limitação estrutural do
+    provider atual (baseado em requests+BeautifulSoup) para sites que
+    dependem de JavaScript para renderizar o conteúdo - fora do escopo
+    do que foi corrigido nesta sessão.
+
+15. Polícia Ambiental e Serd alinham novos investimentos estaduais na Bacia do Rio Doce
+    Veículo: Sistema Brasileiro de Notícias (SBN)
+    Link: https://portalsbn.com.br/policia-ambiental-e-serd-alinham-novos-investimentos-estaduais-na-bacia-do-rio-doce
+    Status: OK
+    Keywords encontradas: Acordo Rio Doce, Mariana, Rio Doce
+    Observação: extração limpa, 3333 caracteres.
+
+
+[Checagem de Fatos]
+
+16. Veja o que é #FATO e o que é #FAKE na entrevista de Romeu Zema ao g1 e à GloboNews
+    Veículo: CBN
+    Link: https://cbn.globo.com/google/amp/coberturas/eleicoes-2026/noticia/2026/08/06/veja-o-que-e-fato-e-o-que-e-fake-na-entrevista-de-romeu-zema-ao-g1-e-a-globonews.ghtml
+    Status: OK
+    Keywords encontradas: Brasil, Mariana, Rio Doce, Vale
+    Observação: página AMP, extração normal, 17030 caracteres (matéria
+    longa, fact-check com várias seções).
+
+17. Veja o que é #FATO e o que é #FAKE na entrevista de Romeu Zema ao g1 e à GloboNews
+    Veículo: Valor Econômico
+    Link: https://valor.globo.com/google/amp/politica/eleicoes-2026/noticia/2026/08/06/veja-o-que-e-fato-e-o-que-e-fake-na-entrevista-de-romeu-zema-ao-g1-e-a-globonews.ghtml
+    Status: OK
+    Keywords encontradas: Brasil, Mariana, Rio Doce
+    Observação: mesmo conteúdo do item 16 (mesma matéria replicada em
+    outro veículo do grupo Globo), extração normal, 17062 caracteres.
+
+
+BUG ENCONTRADO E CORRIGIDO DURANTE ESTE TESTE
+==============================================
+Sites: Diário da Guanabara (dgrj.com.br), Fato Paulista (fatopaulista.com.br),
+A Onça (aonca.com.br) - 3 dos 16 itens testados.
+
+Causa: ContentExtractor.extract() usava soup.select_one("article") para
+o seletor "forte" de mais alta prioridade, e parava no primeiro match.
+Em temas WordPress comuns (Jannah/Jeg, Elementor), cada card de "matérias
+relacionadas"/"em alta" TAMBÉM usa a tag semântica <article> - então o
+primeiro <article> do documento muitas vezes é um card de outra matéria
+qualquer, não o corpo da notícia. Nos 3 sites acima, isso fazia o sistema
+extrair o conteúdo errado (ex.: uma matéria sobre meteorito em Marte no
+lugar da matéria sobre peixes deformados) e, consequentemente, não
+encontrar as keywords - não porque elas não estivessem na matéria, mas
+porque a matéria errada foi lida.
+
+Correção (providers/html/extractor.py): em vez de aceitar o primeiro
+elemento que casar com qualquer seletor "forte" (article, .post,
+.post-content, .entry-content, .article-content), o extractor agora
+compara TODOS os elementos que casam com QUALQUER um desses seletores na
+página e fica com o de maior quantidade de texto - o corpo real da
+matéria é sempre muito mais longo que um card de teaser. Revalidado
+contra os 3 sites (agora extraem o conteúdo correto) e contra todos os
+casos calibrados em sessões anteriores (Itatiaia, BNDES, Emater, etc. -
+sem regressão).
+
+
+LIMITAÇÃO CONHECIDA (NÃO CORRIGIDA NESTA SESSÃO)
+=================================================
+Sites que renderizam conteúdo via JavaScript (ex.: Atlas Público, item 14
+acima) não são lidos corretamente pelo HTMLProvider atual, que baixa
+apenas o HTML estático via requests. Isso exigiria um provider baseado em
+navegador headless (Playwright/Selenium) para resolver - é uma mudança de
+arquitetura maior, fora do escopo desta rodada de testes.
+
+
+================================================================================
+RODADA 2: "Novo Acordo do Rio Doce" (clipping de referência de 04 e 05/08/2026)
+================================================================================
+Data do teste: 2026-08-07
+Mesma metodologia da rodada 1: nenhum dos veículos abaixo está cadastrado
+em sources.json, então este teste valida extração de conteúdo + keyword
+matching direto na URL, não o discovery. Mesmas keywords configuradas.
+
+RESULTADO GERAL
+----------------
+10 de 11 itens tiveram a matéria correta extraída e ao menos uma keyword
+reconhecida. 1 item (Rede Notícia ES) não encontrou nenhuma keyword - não
+é bug do sistema, é lacuna da lista de keywords (ver observação). Nenhum
+bug de extração novo foi encontrado nesta rodada (a correção do bug de
+"article errado" feita na rodada 1 já cobriu o tipo de problema que
+apareceria aqui).
+
+
+DETALHE POR ITEM
+=================
+
+[Processo Indenizatório (Prazos do PID, Mutirões e Disputa Judicial)]
+
+1. Faltam 10 dias para solicitar indenização de R$ 35 mil pelo Programa Indenizatório Definitivo
+   Veículo: G1 Vales de Minas Gerais
+   Link: https://g1.globo.com/google/amp/mg/vales-mg/noticia/2026/08/05/faltam-10-dias-para-solicitar-indenizacao-de-r-35-mil-pelo-programa-indenizatorio-definitivo.ghtml
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Barragem de Fundão, Fundação Renova, Rio Doce
+   Observação: extração limpa, 3147 caracteres, página AMP.
+
+2. Prazo para solicitar indenização do Rio Doce termina em 15 de agosto
+   Veículo: Itatiaia
+   Link: https://www.itatiaia.com.br/valedoaco/prazo-para-solicitar-indenizacao-do-rio-doce-termina-em-15-de-agosto/
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Barragem de Fundão, Fundação Renova, Mariana, Rio Doce, Vale
+   Observação: mesma matéria já testada extensivamente nas sessões
+   anteriores (foi o caso usado para calibrar o discovery e a
+   deduplicação). Aqui bateu as 6 das 8 keywords configuradas.
+
+3. Novo prazo para ingresso ao PID termina no próximo dia 15
+   Veículo: Diário do Aço
+   Link: https://www.diariodoaco.com.br/noticia/135851-novo-prazo-para-ingresso-ao-pid-termina-no-proximo-dia-15
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Barragem de Fundão, Fundação Renova, Mariana, Rio Doce
+   Observação: extração limpa, 3220 caracteres.
+
+4. Samarco promove mutirão tira-dúvidas sobre o PID em Colatina nesta quarta e quinta
+   Veículo: Rede Notícia ES
+   Link: https://redenoticia.es/samarco-promove-mutirao-tira-duvidas-sobre-o-pid-em-colatina-nesta-quarta-e-quinta/
+   Status: FALHOU (lacuna de keyword, não bug)
+   Keywords encontradas: nenhuma
+   Observação: extração correta, 2419 caracteres, texto real da matéria
+   confirmado (fala do mutirão da Samarco sobre o PID em Colatina). O
+   texto não usa literalmente nenhuma das 8 keywords configuradas ("Vale",
+   "Rio Doce", "Acordo Rio Doce", "Fundação Renova", "Bento Rodrigues",
+   "Mariana", "Barragem de Fundão", "Brasil") - ele fala em "PID",
+   "Programa Indenizatório Definitivo" e "Samarco", termos que não estão
+   na lista. Para o c_monitor pegar esse tipo de matéria, a lista de
+   keywords precisaria incluir algo como "PID", "Programa Indenizatório
+   Definitivo" e/ou "Samarco".
+
+5. A reunião de Tom Goodhead com prefeitos sobre a tragédia de Mariana
+   Veículo: O Fator
+   Link: https://ofator.com.br/informacao/a-reuniao-de-tom-goodhead-com-prefeitos-sobre-a-tragedia-de-mariana/
+   Status: OK
+   Keywords encontradas: Barragem de Fundão, Brasil, Mariana
+   Observação: extração limpa, 3300 caracteres.
+
+
+[Meio Ambiente, Biodiversidade e Parcerias Acadêmicas]
+
+6. Parceria entre Samarco e UFV ajuda a criar leis de proteção à biodiversidade
+   Veículo: Brasil Mineral
+   Link: https://www.brasilmineral.com.br/noticias/parceria-entre-samarco-e-ufv-ajuda-a-criar-leis-de-protecao-a-biodiversidade
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Rio Doce
+   Observação: extração limpa, 4223 caracteres.
+
+7. Parceria entre Samarco e UFV amplia conservação de espécies ameaçadas na Bacia do Rio Doce
+   Veículo: Diário do Rio Doce
+   Link: https://drd.com.br/parceria-entre-samarco-e-ufv-amplia-conservacao-de-especies-ameacadas-na-bacia-do-rio-doce/
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Rio Doce, Vale
+   Observação: extração limpa, 5289 caracteres.
+
+8. Parceria entre Samarco e UFV gera dados para conservação de 22 espécies em 2026
+   Veículo: Informe Capixaba
+   Link: https://www.informecapixaba.com.br/2026/08/04/samarco-ufv/
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Brasil, Rio Doce
+   Observação: extração limpa, 5218 caracteres.
+
+9. Estudo da UFV mapeia 22 espécies ameaçadas de extinção na Bacia do Rio Doce e motiva leis municipais
+   Veículo: ES Hoje
+   Link: https://eshoje.com.br/geral/meio-ambiente/2026/08/especies-ameacadas-extincao/
+   Status: OK
+   Keywords encontradas: Acordo Rio Doce, Rio Doce
+   Observação: extração limpa, 5037 caracteres. Título extraído veio
+   diferente do título de referência ("Espécies ameaçadas no Rio Doce
+   ganham proteção" em vez do título completo da lista) - o conteúdo e as
+   keywords batem normalmente, só a tag <title>/og:title da página é
+   mais curta que a manchete usada no clipping de referência.
+
+10. Parceria entre Samarco e UFV gera dados inéditos para conservação de 22 espécies ameaçadas na Bacia do Rio Doce
+    Veículo: Samarco
+    Link: https://www.samarco.com/parceria-entre-samarco-e-ufv-gera-dados-ineditos-para-conservacao-de-22-especies-ameacadas-na-bacia-do-rio-doce/
+    Status: OK, COM RESSALVA DE QUALIDADE DE EXCERTO
+    Keywords encontradas: Acordo Rio Doce, Rio Doce
+    Observação: o conteúdo real da matéria foi extraído corretamente (o
+    texto completo sobre a parceria Samarco/UFV está lá, 7512
+    caracteres), mas o site institucional da Samarco não bate com
+    nenhum dos seletores fortes/fracos do ContentExtractor (article,
+    .post, .entry-content, main, .content etc.) - o container caiu no
+    fallback de <body>, que também traz o menu de navegação inteiro
+    (dezenas de links institucionais) e o banner de cookies antes do
+    texto do artigo. Como o KeywordProcessor.process() gera um Result
+    por parágrafo/linha onde a keyword aparece, e ProcessedPublication.
+    keyword_results() (usado nas telas de Results/Clipping) fica com a
+    PRIMEIRA ocorrência, o excerto que apareceria no clipping final
+    seria "Reparação Bacia do Rio Doce" - um item de menu de navegação,
+    não uma frase de verdade da matéria. A keyword foi encontrada
+    corretamente, mas o excerto mostrado ao usuário ficaria sem sentido
+    nesse caso específico. Não corrigi isso agora porque não foi pedido
+    nesta rodada - fica registrado para uma futura melhoria (ex.: dar ao
+    ContentExtractor mais um seletor específico para o tema WordPress da
+    Samarco, ou ignorar linhas muito curtas/estilo-menu ao escolher o
+    excerto).
+
+
+[Espírito Santo e Agricultura Familiar]
+
+11. "Foi uma oportunidade perdida", diz ex-subsecretário sobre Funsaf
+    Veículo: Século Diário
+    Link: https://www.seculodiario.com.br/meio-ambiente/foi-uma-oportunidade-perdida-diz-ex-subsecretario-sobre-funsaf/
+    Status: OK
+    Keywords encontradas: Acordo Rio Doce, Barragem de Fundão, Mariana, Rio Doce, Vale
+    Observação: extração limpa, 7005 caracteres.
+
+
+RESUMO DA RODADA 2
+==================
+- 10/11 com extração e keyword matching corretos.
+- 1/11 (Rede Notícia ES) é lacuna de keywords configuradas, não falha
+  técnica - a matéria é relevante ao tema mas usa vocabulário (PID,
+  Samarco) que não está na lista de keywords do usuário.
+- 1/11 (Samarco oficial) teve match correto mas com risco de excerto de
+  baixa qualidade (pegou texto de menu em vez de frase do artigo) devido
+  ao ContentExtractor cair no fallback genérico de <body> nesse site
+  específico - registrado como observação, não corrigido.
+- Nenhum bug novo de extração (do tipo "pegou o article errado",
+  corrigido na rodada 1) apareceu nesta rodada.
+
+
+================================================================================
+RODADA 3: "Novo Acordo do Rio Doce" (clipping de referência de 10/08/2026)
+================================================================================
+Data do teste: 2026-08-11
+Mesma metodologia das rodadas anteriores. 19 itens, nenhum veículo
+cadastrado em sources.json - teste de extração + keyword matching direto
+na URL. Mesmas 8 keywords configuradas.
+
+RESULTADO GERAL
+----------------
+Primeira passada: 17/19 OK. As 2 falhas levaram a uma correção real no
+ContentExtractor (providers/html/extractor.py) e a descoberta (e correção
+imediata) de uma regressão causada por essa própria correção. Resultado
+final após os ajustes: 18/19 OK - a única falha restante é uma limitação
+já conhecida (site renderizado via JavaScript), sem correção nesta sessão.
+
+BUG NOVO ENCONTRADO E CORRIGIDO: "Sou Patos"
+---------------------------------------------
+URL: https://soupatos.com.br/teofilo-otoni-e-a-nova-capital-de-mg-e-governo-anuncia-investimentos-para-a-policia-civil-na-regiao/
+
+Sintoma: o texto extraído era sobre "Vacinas contra poliomielite... em
+Patos de Minas" - uma matéria completamente diferente da esperada
+(sobre Teófilo Otoni e investimentos na Polícia Civil).
+
+Causa: esse site usa o page builder Elementor. A página tem 6 tags
+<article class="elementor-post elementor-grid-item">, mas TODAS são
+cards de um widget de "últimas notícias" - nenhuma é o corpo real da
+matéria. O texto de verdade fica dentro de um <div
+class="elementor-widget-container">, um contêiner genérico do
+Elementor usado por QUALQUER widget da página (não é uma tag pensada
+para indicar "isto é um artigo").
+
+O extractor já comparava candidatos dentro do grupo de seletores
+"fortes" (article, .post, .entry-content...) e ficava com o mais
+longo - mas antes disso, se qualquer seletor forte batesse (mesmo
+errado e curto, como os cards de relacionados), o código retornava na
+hora, sem nunca chequar os seletores "fracos". Corrigido: agora o
+maior candidato de cada grupo (forte e fraco) é comparado entre si, e
+".elementor-widget-container" foi adicionado à lista de seletores
+fracos.
+
+REGRESSÃO CAUSADA PELA PRÓPRIA CORREÇÃO, ENCONTRADA E CORRIGIDA: "Revista Amazônia"
+-------------------------------------------------------------------------------------
+URL: https://revistaamazonia.com.br/peixes-es-taxa-recorde-deformacoes/
+
+Ao revalidar TODOS os casos já calibrados depois da correção acima
+(prática que já vínhamos seguindo desde a rodada 1), essa matéria - que
+passava normalmente antes - passou a ser classificada como "página de
+listagem" (23 headings).
+
+Causa: o seletor forte ("article", 8009 caracteres, conteúdo CORRETO)
+perdeu para um seletor fraco ("div.td-main-content-wrap", do tema
+WordPress "Newspaper", 8940 caracteres) só porque este último era um
+pouco mais longo - mas esse wrapper mais largo continha a matéria
+inteira MAIS um bloco de "veja também" logo abaixo, e por isso acabou
+sendo classificado como listagem. Ou seja, a correção do caso "Sou
+Patos" (onde a diferença de tamanho era de 8x) foi longe demais e
+passou a aceitar diferenças de tamanho pequenas (nesse caso, ~11%)
+como se fossem prova de que o seletor forte estava errado.
+
+Correção: adicionado WEAK_OVERRIDE_RATIO = 2.0 - um seletor fraco só
+"vence" um forte se tiver pelo menos o dobro do texto, não bastando ser
+só um pouco maior. Todos os casos de "vitória legítima do fraco" já
+observados (Sou Patos 8x, Fato Paulista 60x, A Onça 38x) ficam bem
+acima desse limite; o caso de "vitória espúria" (Revista Amazônia,
+~1,1x) fica bem abaixo.
+
+Revalidado depois do ajuste: os 8 casos calibrados nas rodadas
+anteriores + Sou Patos + Revista Amazônia - todos corretos, nenhuma
+regressão.
+
+FALHA RESTANTE (limitação já conhecida, não corrigida): "Nexo Jornal"
+------------------------------------------------------------------------
+URL: https://www.nexojornal.com.br/externo/2026/08/10/peixe-anomalia-contaminacao-barragem-mariana
+
+0 caracteres extraídos. O HTML estático baixado tem <body> com apenas 2
+filhos e nenhum texto real - o site renderiza o conteúdo via
+JavaScript, mesma limitação já documentada para Atlas Público e Jornal
+Minas Gerais. Exigiria um provider com navegador headless
+(Playwright/Selenium) para resolver.
+
+FALSO ALARME (instabilidade de rede, não é bug): "Colatina em Ação"
+------------------------------------------------------------------------
+Na primeira passada, essa URL falhou com "download falhou". Ao
+tentar de novo isoladamente (e na segunda passada completa), o
+download funcionou normalmente e a matéria foi extraída e casada com
+keywords sem problema. Não indica bug no código - só uma falha
+pontual de rede/timeout no momento daquela requisição específica.
+
+RESUMO DA RODADA 3
+==================
+- 18/19 OK na validação final.
+- 1 bug real de extração encontrado e corrigido (Elementor
+  ".elementor-widget-container").
+- 1 regressão introduzida pela própria correção, encontrada por
+  revalidar os casos antigos, e corrigida com um limiar de proporção
+  (WEAK_OVERRIDE_RATIO) em vez de "qualquer diferença de tamanho
+  vale".
+- 1 falha remanescente é a limitação já conhecida de sites
+  renderizados via JavaScript (fora do escopo de correção).
+- 1 falha da primeira passada era só instabilidade de rede, sem
+  relação com o código.

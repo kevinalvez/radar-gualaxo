@@ -1,0 +1,131 @@
+RADAR GUALAXO - INSTRUCOES DE INSTALACAO NA MAQUINA SERVIDOR
+==============================================================
+
+Este arquivo é o passo a passo pra colocar a v1 (interface web) rodando
+numa outra máquina, que vai funcionar como servidor pra todo mundo
+acessar pela rede local.
+
+------------------------------------------------------------
+1) REQUISITOS
+------------------------------------------------------------
+
+- Python 3.14 (ou próximo - testado com 3.14.6). Baixe em
+  https://www.python.org/downloads/ se a máquina não tiver.
+- Durante a instalação do Python, marque a opção "Add python.exe to PATH".
+
+Confirme depois de instalar, num terminal (PowerShell/cmd):
+
+    python --version
+
+------------------------------------------------------------
+2) COPIAR O PROJETO
+------------------------------------------------------------
+
+Copie a pasta inteira do projeto (c_monitor/) pra máquina nova - por
+pendrive, rede, git, o que for mais fácil. Não existe controle de versão
+(git) nesse projeto ainda, então é literalmente copiar a pasta.
+
+IMPORTANTE: copie também a pasta config/data/ com o conteúdo ATUAL dela
+(sources.json, keywords.json, schedule.json) - é lá que estão as 73
+fontes e as 8 palavras-chave já curadas. Se você clonar/copiar só o
+código sem essa pasta, o app sobe "vazio" e você perde todo o trabalho de
+curadoria já feito.
+
+------------------------------------------------------------
+3) INSTALAR AS DEPENDENCIAS
+------------------------------------------------------------
+
+Dentro da pasta do projeto, na máquina nova:
+
+    python -m pip install -r requirements.txt
+
+Isso instala só o necessário pra interface web (feedparser, requests,
+beautifulsoup4, Flask). Não precisa instalar o PySide6 (interface desktop
+antiga) numa máquina que só vai rodar o servidor web.
+
+------------------------------------------------------------
+4) RODAR O SERVIDOR
+------------------------------------------------------------
+
+    python -m interface_web.app
+
+ATENCAO: NÃO use "python main.py" - esse comando ainda abre a interface
+desktop antiga (PySide6), não a web. Isso não foi alterado de propósito
+(ver readme.md, seção "Web Application").
+
+O terminal precisa continuar aberto rodando esse comando - se fechar a
+janela, o servidor cai. Isso ainda não está configurado pra rodar como
+serviço/reiniciar sozinho (é uma limitação conhecida da v1 - ver
+readme.md, "Known Limitations"). Se quiser deixar rodando de forma mais
+robusta (sobrevive a logoff, reinicia sozinho se cair), a próxima etapa
+seria configurar como serviço do Windows (ex: NSSM) ou uma tarefa
+agendada - ainda não fizemos isso.
+
+------------------------------------------------------------
+5) DESCOBRIR O IP DA MAQUINA (pra outras pessoas acessarem)
+------------------------------------------------------------
+
+Na máquina servidor, rode:
+
+    ipconfig
+
+Procure o "Endereço IPv4" do adaptador que está realmente na rede (Wi-Fi
+ou Ethernet - ignore adaptadores virtuais tipo "vEthernet"). Vai ser algo
+como 192.168.x.x.
+
+Outras pessoas na mesma rede acessam via:
+
+    http://<esse-ip>:5000
+
+Ex: http://192.168.1.51:5000
+
+(Você mencionou que vai montar um link mais bonito, tipo um DNS interno,
+quando migrar pra essa máquina - isso é por sua conta; o app já está
+pronto pra ser acessado por IP:porta enquanto isso não existe.)
+
+------------------------------------------------------------
+6) LIBERAR A PORTA NO FIREWALL DO WINDOWS
+------------------------------------------------------------
+
+Por padrão o Firewall do Windows bloqueia conexão de entrada não
+solicitada, especialmente se a rede estiver marcada como "Pública". Sem
+isso, outras pessoas não vão conseguir acessar mesmo com o servidor
+rodando.
+
+Rode isso no PowerShell da máquina servidor (como Administrador):
+
+    New-NetFirewallRule -DisplayName "Radar Gualaxo (porta 5000)" -Direction Inbound -Protocol TCP -LocalPort 5000 -Action Allow
+
+Isso libera só a porta 5000, sem mexer em mais nada da segurança do
+Windows.
+
+Pra conferir se a regra foi criada:
+
+    Get-NetFirewallRule -DisplayName "Radar Gualaxo*"
+
+------------------------------------------------------------
+7) LIMITACOES CONHECIDAS DESSA V1 (pra não se assustar)
+------------------------------------------------------------
+
+- app.secret_key (em interface_web/app.py) é um valor fixo de
+  desenvolvimento ("dev-only-change-me"). Pra um teste em rede fechada
+  não tem problema; se isso um dia sair da intranet, precisa virar um
+  segredo de verdade.
+- output/results.json e os arquivos em config/data/*.json não têm trava
+  contra escrita simultânea - se duas pessoas mexerem ao mesmo tempo (uma
+  rodando um monitoramento, outra editando fontes), o último a salvar
+  pode sobrescrever o outro. Baixo risco no uso atual, mas é uma
+  limitação conhecida, não um bug escondido.
+- Os campos de "Orquestração" (rodar a cada X dias às HH:MM) na aba
+  Configuração só salvam a preferência - ainda não existe nada
+  executando sozinho em background seguindo esse agendamento.
+
+------------------------------------------------------------
+RESUMO RÁPIDO
+------------------------------------------------------------
+
+    cd caminho\para\c_monitor
+    python -m pip install -r requirements.txt
+    python -m interface_web.app
+
+Depois, de outro dispositivo na mesma rede: http://<ip-da-maquina>:5000

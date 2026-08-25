@@ -1,0 +1,77 @@
+CLAUDE CODE - CONFIGURACAO NA MAQUINA SERVIDOR
+==============================================================
+
+Passo a passo pra ter o Claude Code funcionando na máquina nova, do jeito
+que já uso aqui.
+
+------------------------------------------------------------
+1) INSTALAR O CLAUDE CODE
+------------------------------------------------------------
+
+O método de instalação pode ter mudado desde que escrevi isso - confira
+sempre a fonte oficial: https://claude.com/claude-code (ou dentro de
+qualquer sessão já rodando, digite /help pra ver informações de versão e
+atualização).
+
+O método mais comum é via npm (precisa do Node.js instalado primeiro):
+
+    npm install -g @anthropic-ai/claude-code
+
+Depois de instalado, dentro da pasta do projeto (c_monitor/), rode:
+
+    claude
+
+Na primeira vez ele vai pedir login (conta Claude.ai/assinatura, ou uma
+ANTHROPIC_API_KEY, dependendo de como você usa o Claude normalmente).
+
+------------------------------------------------------------
+2) CONTEXTO DO PROJETO - ISSO É AUTOMATICO
+------------------------------------------------------------
+
+O arquivo CLAUDE.md já está dentro da pasta do projeto (você vai copiar
+ele junto quando copiar o resto do código, ver config.txt). O Claude Code
+lê esse arquivo automaticamente sempre que é aberto dentro dessa pasta -
+não precisa configurar nada a mais pra isso funcionar. Esse arquivo já
+descreve a arquitetura, comandos e convenções do projeto.
+
+------------------------------------------------------------
+3) O QUE NAO MIGRA SOZINHO: MEMORIA DE SESSAO
+------------------------------------------------------------
+
+Isso é importante pra você não estranhar quando começar a usar na máquina
+nova.
+
+Além do CLAUDE.md (que é parte do projeto e migra junto), eu também
+guardo memória entre sessões num lugar separado, específico dessa
+máquina:
+
+    C:\Users\carit\.claude\projects\C--Users-carit-OneDrive-Documents-dev-crawling-c-monitor\memory\
+
+Esse caminho é derivado do caminho absoluto da pasta do projeto nessa
+máquina (usuário "carit", disco C:, etc.). Na máquina nova, com outro
+usuário/caminho, esse identificador vai ser diferente por padrão - então
+uma sessão nova do Claude Code lá NÃO vai começar sabendo automaticamente
+das decisões que tomamos aqui (o motivo por trás da troca RSS pra 8
+fontes, a avaliação do Ollama, os achados sobre Querido Diário/DOU, etc.)
+- ela vai reconstruir entendimento a partir do CLAUDE.md e do código, que
+já são bem completos.
+
+Se quiser levar essa memória junto:
+
+- Copie manualmente a pasta "memory" acima pra pasta equivalente na
+  máquina nova (o caminho exato lá vai depender de como o Claude Code
+  identifica o projeto nessa outra máquina - pode não ser automático,
+  pode precisar ajustar o nome da pasta pra bater com o caminho novo).
+- Ou simplesmente aceite começar do zero por lá - o CLAUDE.md e o
+  próprio código carregam a maior parte do contexto que importa pra
+  continuar o trabalho.
+
+------------------------------------------------------------
+RESUMO RAPIDO
+------------------------------------------------------------
+
+    npm install -g @anthropic-ai/claude-code
+    cd caminho\para\c_monitor
+    claude
+
+(fazer login quando pedir - CLAUDE.md já é lido automaticamente)

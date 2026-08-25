@@ -1,0 +1,11 @@
+{
+    "mode": "interval",
+    "interval_days": null,
+    "weekdays": [],
+    "time": null,
+    "period": "7_days",
+    "start_date": null,
+    "end_date": null,
+    "keywords": [],
+    "sources": []
+}

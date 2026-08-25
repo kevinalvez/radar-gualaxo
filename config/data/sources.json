@@ -1,0 +1,586 @@
+[
+    {
+        "name": "G1",
+        "provider": "rss",
+        "url": "https://g1.globo.com/dynamo/brasil/rss2.xml",
+        "enabled": true,
+        "category": "Notícias Gerais",
+        "description": "Portal de notícias"
+    },
+    {
+        "name": "Agência Brasil",
+        "provider": "rss",
+        "url": "https://agenciabrasil.ebc.com.br/rss",
+        "enabled": true,
+        "category": "Notícias Gerais",
+        "description": "Agência pública de notícias"
+    },
+    {
+        "name": "MPMG",
+        "provider": "html",
+        "url": "https://www.mpmg.mp.br/portal/",
+        "enabled": true,
+        "category": "Articulação de Municípios e Ações Judiciais",
+        "description": "Ministério Público de Minas Gerais"
+    },
+    {
+        "name": "Diário Oficial da União",
+        "provider": "html",
+        "url": "https://www.in.gov.br/acesso-a-informacao/dados-abertos/base-de-dados",
+        "enabled": true,
+        "category": "Diário Oficial e Atos Legais",
+        "description": "Base de dados do Diário Oficial da União"
+    },
+    {
+        "name": "Jornal Minas Gerais",
+        "provider": "html",
+        "url": "https://www.jornalminasgerais.mg.gov.br/",
+        "enabled": false,
+        "category": "Diário Oficial e Atos Legais",
+        "description": "Diário oficial de Minas Gerais - desativado: site renderiza via JavaScript, discovery encontra 0 links no HTML estático"
+    },
+    {
+        "name": "JusBrasil Diários",
+        "provider": "html",
+        "url": "https://www.jusbrasil.com.br/diarios/DOU/",
+        "enabled": false,
+        "category": "Diário Oficial e Atos Legais",
+        "description": "Publicações jurídicas - desativado: site bloqueia acesso (HTTP 403 Forbidden)"
+    },
+    {
+        "name": "Biblioteca MPF",
+        "provider": "html",
+        "url": "https://biblioteca.mpf.mp.br/repositorio/collections/bb663ff2-89d9-40d8-9b83-265c9af3a717/search",
+        "enabled": true,
+        "category": "Articulação de Municípios e Ações Judiciais",
+        "description": "Repositório do Ministério Público Federal"
+    },
+    {
+        "name": "TRF6",
+        "provider": "html",
+        "url": "https://portal.trf6.jus.br/",
+        "enabled": true,
+        "category": "Articulação de Municípios e Ações Judiciais",
+        "description": "Tribunal Regional Federal da 6ª Região"
+    },
+    {
+        "name": "Diário Oficial Mariana",
+        "provider": "html",
+        "url": "https://mariana.mg.gov.br/diario-oficial-pmm",
+        "enabled": true,
+        "category": "Diário Oficial e Atos Legais",
+        "description": "Diário oficial municipal"
+    },
+    {
+        "name": "Portal Rio Doce MG",
+        "provider": "html",
+        "url": "https://www.mg.gov.br/riodoce",
+        "enabled": false,
+        "category": "Portais Institucionais sobre o Rio Doce",
+        "description": "Portal institucional sobre Rio Doce"
+    },
+    {
+        "name": "BNDES Fundo Rio Doce",
+        "provider": "html",
+        "url": "https://www.bndes.gov.br/wps/portal/site/home/transparencia/fundos-governamentais/fundo-rio-doce",
+        "enabled": true,
+        "category": "Portais Institucionais sobre o Rio Doce",
+        "description": "Informações do Fundo Rio Doce"
+    },
+    {
+        "name": "Fundação Banco do Brasil Editais",
+        "provider": "html",
+        "url": "https://fbb.org.br/edital-publico/editalriodoce/",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Editais Rio Doce"
+    },
+    {
+        "name": "Emater MG",
+        "provider": "html",
+        "url": "https://www.emater.mg.gov.br/portal.do?flagweb=novosite_mariana&grupo=1950744",
+        "enabled": true,
+        "category": "Assistência Técnica e Extensão Rural",
+        "description": "Assistência técnica rural"
+    },
+    {
+        "name": "Desenvolvimento MG Editais",
+        "provider": "html",
+        "url": "https://desenvolvimento.mg.gov.br/inicio/editais",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Editais estaduais"
+    },
+    {
+        "name": "CAPTA",
+        "provider": "html",
+        "url": "https://capta.org.br/",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Editais e oportunidades"
+    },
+    {
+        "name": "Fundo Brasil",
+        "provider": "html",
+        "url": "https://www.fundobrasil.org.br/",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Fundo Brasil"
+    },
+    {
+        "name": "Prosas Editais",
+        "provider": "html",
+        "url": "https://produtos.prosas.com.br/editais",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Plataforma de editais"
+    },
+    {
+        "name": "Agência SUS Rio Doce",
+        "provider": "html",
+        "url": "https://agenciasus.org.br/pes-rio-doce/",
+        "enabled": false,
+        "category": "Portais Institucionais sobre o Rio Doce",
+        "description": "Projeto Rio Doce - desativado: URL retorna HTTP 404, precisa de link atualizado"
+    },
+    {
+        "name": "Agência de Notícias BNDES",
+        "provider": "html",
+        "url": "https://agenciadenoticias.bndes.gov.br",
+        "enabled": true,
+        "category": "Notícias Gerais",
+        "description": "Notícias BNDES"
+    },
+    {
+        "name": "FNAS",
+        "provider": "html",
+        "url": "https://fnas.mds.gov.br/profort-suas/",
+        "enabled": true,
+        "category": "Editais e Oportunidades",
+        "description": "Fundo Nacional de Assistência Social"
+    },
+    {
+        "name": "Agência Brasil",
+        "provider": "html",
+        "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-08/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Diário da Guanabara",
+        "provider": "html",
+        "url": "https://dgrj.com.br/brasil/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Jovem Pan",
+        "provider": "html",
+        "url": "https://jovempan.com.br/brasil/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Isto É",
+        "provider": "html",
+        "url": "https://istoe.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Fato Paulista",
+        "provider": "html",
+        "url": "https://fatopaulista.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "BRA 1",
+        "provider": "html",
+        "url": "https://www.bra1.com.br/geral/id-675533/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Clic RDC",
+        "provider": "html",
+        "url": "https://clicrdc.com.br/meio-ambiente/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Cenário MT",
+        "provider": "html",
+        "url": "https://cenariomt.com.br/mundo/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Últimas Notícias",
+        "provider": "html",
+        "url": "https://ultimasnoticias.inf.br/noticia/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "A Onça",
+        "provider": "html",
+        "url": "https://www.aonca.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Século Diário",
+        "provider": "html",
+        "url": "https://www.seculodiario.com.br/meio-ambiente/",
+        "enabled": true,
+        "category": "Saúde das Populações Atingidas e Pesquisa Acadêmica",
+        "description": ""
+    },
+    {
+        "name": "O Fator",
+        "provider": "html",
+        "url": "https://ofator.com.br/informacao/",
+        "enabled": true,
+        "category": "Governança, Repactuação e Articulação Municipal",
+        "description": "Seção cobre também Articulação de Municípios e Ações Judiciais e Processo Indenizatório (Prazos do PID) - categoria mais abrangente escolhida por consolidar 3 matérias de temas próximos"
+    },
+    {
+        "name": "O Brasilianista",
+        "provider": "html",
+        "url": "https://obrasilianista.com.br/camilalutfi/",
+        "enabled": true,
+        "category": "Articulação de Municípios e Ações Judiciais",
+        "description": ""
+    },
+    {
+        "name": "Atlas Público",
+        "provider": "html",
+        "url": "https://atlaspublico.com.br/noticias/",
+        "enabled": true,
+        "category": "Projetos",
+        "description": ""
+    },
+    {
+        "name": "Sistema Brasileiro de Notícias (SBN)",
+        "provider": "html",
+        "url": "https://portalsbn.com.br/",
+        "enabled": true,
+        "category": "Projetos",
+        "description": ""
+    },
+    {
+        "name": "CBN",
+        "provider": "html",
+        "url": "https://cbn.globo.com/google/amp/coberturas/eleicoes-2026/noticia/2026/08/06/",
+        "enabled": true,
+        "category": "Checagem de Fatos",
+        "description": ""
+    },
+    {
+        "name": "Valor Econômico",
+        "provider": "html",
+        "url": "https://valor.globo.com/google/amp/politica/eleicoes-2026/noticia/2026/08/06/",
+        "enabled": true,
+        "category": "Checagem de Fatos",
+        "description": ""
+    },
+    {
+        "name": "G1 Vales de Minas Gerais",
+        "provider": "html",
+        "url": "https://g1.globo.com/google/amp/mg/vales-mg/noticia/",
+        "enabled": true,
+        "category": "Processo Indenizatório (Prazos do PID, Mutirões e Disputa Judicial)",
+        "description": ""
+    },
+    {
+        "name": "Itatiaia",
+        "provider": "html",
+        "url": "https://www.itatiaia.com.br/valedoaco/",
+        "enabled": true,
+        "category": "Processo Indenizatório (Prazos do PID, Mutirões e Disputa Judicial)",
+        "description": ""
+    },
+    {
+        "name": "Diário do Aço",
+        "provider": "html",
+        "url": "https://www.diariodoaco.com.br/noticia/",
+        "enabled": true,
+        "category": "Processo Indenizatório (Prazos do PID, Mutirões e Disputa Judicial)",
+        "description": ""
+    },
+    {
+        "name": "Rede Notícia ES",
+        "provider": "html",
+        "url": "https://redenoticia.es/",
+        "enabled": true,
+        "category": "Processo Indenizatório (Prazos do PID, Mutirões e Disputa Judicial)",
+        "description": ""
+    },
+    {
+        "name": "Brasil Mineral",
+        "provider": "html",
+        "url": "https://www.brasilmineral.com.br/noticias/",
+        "enabled": false,
+        "category": "Meio Ambiente, Biodiversidade e Parcerias Acadêmicas",
+        "description": ""
+    },
+    {
+        "name": "Diário do Rio Doce",
+        "provider": "html",
+        "url": "https://drd.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente, Biodiversidade e Parcerias Acadêmicas",
+        "description": ""
+    },
+    {
+        "name": "Informe Capixaba",
+        "provider": "html",
+        "url": "https://www.informecapixaba.com.br/2026/08/04/",
+        "enabled": true,
+        "category": "Meio Ambiente, Biodiversidade e Parcerias Acadêmicas",
+        "description": ""
+    },
+    {
+        "name": "ES Hoje",
+        "provider": "html",
+        "url": "https://eshoje.com.br/geral/meio-ambiente/2026/08/",
+        "enabled": true,
+        "category": "Meio Ambiente, Biodiversidade e Parcerias Acadêmicas",
+        "description": ""
+    },
+    {
+        "name": "Samarco",
+        "provider": "html",
+        "url": "https://www.samarco.com/",
+        "enabled": false,
+        "category": "Meio Ambiente, Biodiversidade e Parcerias Acadêmicas",
+        "description": "Desativado a pedido: fonte é a própria responsável pelo rompimento da barragem de Fundão, não uma fonte neutra/de interesse para o monitoramento feito em nome dos atingidos - traz notícias institucionais genéricas da empresa, não conteúdo relevante ao caso"
+    },
+    {
+        "name": "Agência Primaz",
+        "provider": "html",
+        "url": "https://agenciaprimaz.com.br/noticia/",
+        "enabled": true,
+        "category": "Processo Indenizatório e Reparação (Prazos do PID)",
+        "description": ""
+    },
+    {
+        "name": "Colatina em Ação",
+        "provider": "html",
+        "url": "https://colatinaemacao.com.br/2026/08/08/",
+        "enabled": true,
+        "category": "Processo Indenizatório e Reparação (Prazos do PID)",
+        "description": ""
+    },
+    {
+        "name": "Século Diário",
+        "provider": "html",
+        "url": "https://www.seculodiario.com.br/saude/",
+        "enabled": true,
+        "category": "Saúde das Populações Atingidas, Pesquisa Acadêmica e Controle Social",
+        "description": ""
+    },
+    {
+        "name": "Combate Racismo Ambiental",
+        "provider": "html",
+        "url": "https://racismoambiental.net.br/2026/08/07/",
+        "enabled": true,
+        "category": "Saúde das Populações Atingidas, Pesquisa Acadêmica e Controle Social",
+        "description": ""
+    },
+    {
+        "name": "ES Fala",
+        "provider": "html",
+        "url": "https://www.esfala.com.br/2026/08/09/",
+        "enabled": true,
+        "category": "Saúde das Populações Atingidas, Pesquisa Acadêmica e Controle Social",
+        "description": ""
+    },
+    {
+        "name": "BHAZ",
+        "provider": "html",
+        "url": "https://bhaz.com.br/noticias/brasil/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "Nexo Jornal",
+        "provider": "html",
+        "url": "https://www.nexojornal.com.br/externo/2026/08/10/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "Blog do Pedlowski",
+        "provider": "html",
+        "url": "https://blogdopedlowski.com/2026/08/08/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "Agro2",
+        "provider": "html",
+        "url": "https://agro2.com.br/agronegocio/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "O Presente Rural",
+        "provider": "html",
+        "url": "https://opresenterural.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "Revista Amazônia",
+        "provider": "html",
+        "url": "https://revistaamazonia.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente e Ictiofauna",
+        "description": ""
+    },
+    {
+        "name": "A Gazeta",
+        "provider": "html",
+        "url": "https://www.agazeta.com.br/artigos/",
+        "enabled": true,
+        "category": "Governança, Repactuação e Articulação Municipal",
+        "description": ""
+    },
+    {
+        "name": "Sou Patos",
+        "provider": "rss",
+        "url": "https://soupatos.com.br/feed/",
+        "enabled": true,
+        "category": "Gestão Pública",
+        "description": ""
+    },
+    {
+        "name": "Rádio Mundo Melhor",
+        "provider": "rss",
+        "url": "https://radiomundomelhor.com.br/feed/",
+        "enabled": true,
+        "category": "Gestão Pública",
+        "description": ""
+    },
+    {
+        "name": "Século Diário",
+        "provider": "html",
+        "url": "https://www.seculodiario.com.br/cidades/",
+        "enabled": true,
+        "category": "Gestão Pública",
+        "description": ""
+    },
+    {
+        "name": "Blog do Pedlowski",
+        "provider": "html",
+        "url": "https://blogdopedlowski.com/2026/08/07/",
+        "enabled": true,
+        "category": "Setor Mineral e Mineração",
+        "description": ""
+    },
+    {
+        "name": "ES Brasil",
+        "provider": "rss",
+        "url": "https://esbrasil.com.br/feed/",
+        "enabled": true,
+        "category": "Processo Indenizatório e Reparação (Prazos do PID)",
+        "description": ""
+    },
+    {
+        "name": "Espírito Santo Notícias",
+        "provider": "rss",
+        "url": "https://www.espiritosantonoticias.com.br/feed/",
+        "enabled": true,
+        "category": "Processo Indenizatório e Reparação (Prazos do PID)",
+        "description": ""
+    },
+    {
+        "name": "Rede Educadora",
+        "provider": "rss",
+        "url": "https://radioeducadoramg.com.br/feed/",
+        "enabled": true,
+        "category": "Processo Indenizatório e Reparação (Prazos do PID)",
+        "description": ""
+    },
+    {
+        "name": "Brasil 247",
+        "provider": "html",
+        "url": "https://www.brasil247.com/brasil-sustentavel/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "FA Notícias",
+        "provider": "html",
+        "url": "https://fanoticias.com.br/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Noroeste News",
+        "provider": "html",
+        "url": "https://www.noroestenews.com/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "G1 Espírito Santo",
+        "provider": "html",
+        "url": "https://g1.globo.com/es/espirito-santo/",
+        "enabled": true,
+        "category": "Meio Ambiente, Ictiofauna e Possíveis Impactos",
+        "description": ""
+    },
+    {
+        "name": "Jornal Geraes",
+        "provider": "rss",
+        "url": "https://jornalgeraes.com.br/feed/",
+        "enabled": true,
+        "category": "Governança, Repactuação e Articulação Municipal",
+        "description": ""
+    },
+    {
+        "name": "Jornal da Cidade Vales de Minas",
+        "provider": "rss",
+        "url": "https://jornaldacidadevalesdeminas.com/feed/",
+        "enabled": true,
+        "category": "Saúde das Populações Atingidas e Pesquisa Acadêmica",
+        "description": ""
+    },
+    {
+        "name": "Jornal Bairros Net",
+        "provider": "rss",
+        "url": "https://www.jornalbairrosnet.com.br/feed/",
+        "enabled": true,
+        "category": "Gestão Pública",
+        "description": ""
+    },
+    {
+        "name": "TCE-ES",
+        "provider": "html",
+        "url": "https://www.tcees.tc.br/noticias/",
+        "enabled": true,
+        "category": "Gestão Pública",
+        "description": ""
+    }
+]

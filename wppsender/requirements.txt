@@ -1,0 +1,10 @@
+# wppsender/send_clipping.py - dependências
+#
+# Separado do requirements.txt principal do projeto porque é uma
+# ferramenta independente (não faz parte do app web/desktop).
+#
+# Também precisa do Google Chrome instalado na máquina (o Selenium
+# controla o Chrome já instalado, não baixa um sozinho).
+
+selenium==4.44.0
+pyperclip==1.11.0
