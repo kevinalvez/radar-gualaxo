@@ -42,6 +42,14 @@ class SummaryProcessor:
     # instead of cleaning it up. Requiring all-caps avoids that.
     LABEL_MAX_LENGTH = 60
 
+    # Soft cap on the final summary's length. Sentences are added one at a
+    # time up to this limit rather than concatenating a fixed sentence
+    # count and hard-slicing the result - a fixed slice would cut mid-word
+    # whenever the selected sentences happened to add up to more than this,
+    # producing a summary that visibly stops mid-sentence.
+    MAX_SUMMARY_LENGTH = 500
+    MAX_SENTENCES = 2
+
     def process(self, publication):
 
         content = publication.content
@@ -80,9 +88,39 @@ class SummaryProcessor:
             return []
 
 
-        summary = ". ".join(
-            sentences[:2]
-        )
+        selected = []
+        length = 0
+
+        for sentence in sentences:
+
+            separator_length = 2 if selected else 0  # ". "
+
+            if selected and length + separator_length + len(sentence) > self.MAX_SUMMARY_LENGTH:
+
+                break
+
+            selected.append(sentence)
+            length += separator_length + len(sentence)
+
+            if len(selected) >= self.MAX_SENTENCES:
+
+                break
+
+        if not selected:
+
+            selected = [sentences[0]]
+
+        summary = ". ".join(selected)
+
+        if not summary.endswith((".", "!", "?")):
+
+            summary += "."
+
+        if len(summary) > self.MAX_SUMMARY_LENGTH:
+
+            # A single sentence alone exceeds the cap - truncate at the
+            # last full word instead of mid-word, and mark it as cut off.
+            summary = summary[:self.MAX_SUMMARY_LENGTH].rsplit(" ", 1)[0].rstrip(",.;:") + "..."
 
 
         return [
@@ -91,7 +129,7 @@ class SummaryProcessor:
                 publication_id=publication.id,
                 processor="summary",
                 type="summary",
-                value=summary[:500],
+                value=summary,
                 metadata={
                     "length": len(summary)
                 }
