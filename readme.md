@@ -6,7 +6,7 @@
 
 # Overview
 
-Radar Gualaxo is a monitoring application designed to collect information from multiple sources through a modular pipeline architecture. It ships with three interchangeable interfaces driving the exact same `core/` Pipeline: a Flask-based web interface (`interface_web/`, the current v1 target - single server process, reachable from any browser on the network), a desktop interface (`interface_qt/`, PySide6), and a legacy Tkinter interface (`legacy/interface/`, kept as a fallback).
+Radar Gualaxo is a monitoring application designed to collect information from multiple sources through a modular pipeline architecture. Its primary interface is a Flask-based web app (`interface_web/` - single server process, reachable from any browser on the network), driving the same `core/` Pipeline as two legacy desktop interfaces (`interface_qt/`, PySide6; `legacy/interface/`, Tkinter) kept in the codebase but no longer actively developed.
 
 Although the first use case is monitoring topics related to the **Rio Doce Agreement**, the project was designed to be completely domain-agnostic.
 
@@ -71,10 +71,9 @@ Outputs
 
 `interface_web/` (Flask + Jinja2 + vanilla JS, no separate JSON API/SPA
 split - server-rendered HTML, same shape as a classic PHP app) is the
-interface being evaluated to replace the desktop apps as the primary way
-to run Radar Gualaxo. Rationale: centralize execution on one server
-machine, reachable from any browser on the local network, instead of
-requiring each user to run a desktop app.
+primary way to run Radar Gualaxo, replacing the desktop apps. Rationale:
+centralize execution on one server machine, reachable from any browser on
+the local network, instead of requiring each user to run a desktop app.
 
 Run with:
 
@@ -160,8 +159,8 @@ edge case at this stage's usage level.
 # Desktop Application
 
 The desktop interfaces are responsible only for configuration and
-execution - kept in the codebase as fallbacks while the web interface
-above is evaluated as the primary one.
+execution - kept in the codebase as legacy fallbacks. The web interface
+above is the primary, actively developed way to run Radar Gualaxo.
 
 ```
                  Radar Gualaxo Interface
@@ -420,14 +419,6 @@ return an essentially empty `<body>` to a plain HTTP GET, so this provider
 extracts nothing from them (confirmed on a handful of sources, e.g. Atlas
 Público, Jornal Minas Gerais, Nexo Jornal). Fixing this would require a
 headless-browser-based provider (Playwright/Selenium).
-
-Future versions will support:
-
-- Multiple articles per page
-- Internal search
-- Sitemap discovery
-- Site-specific parsers
-- Headless-browser rendering for JavaScript-only sites
 
 ---
 
@@ -914,7 +905,8 @@ The core pipeline should never need modification when adding new Providers.
   Limitations
 - Querido Diário's public API and the DOU/`in.gov.br` ecosystem were
   evaluated for official-gazette coverage - neither integrated yet, see
-  Known Limitations and Future Integrations
+  Known Limitations and the Version 2 government/gazette integrations
+  entry in Roadmap
 - Orquestração split into its own tab, with its own keyword/source
   selection independent from the Busca tab's, persisted to
   `config/data/schedule.json` (`config/schedule.py`) - see Web
@@ -1096,13 +1088,30 @@ later version rather than retrofitted onto the JSON files.
 - Keyword categorization: distinguish anchor vs. context keywords, and/or
   a category↔keyword mapping table, so Clipping grouping and relevance
   matching don't depend solely on Source category (see Known Limitations)
+- PDF Provider
+- API Provider
+- Government/official-gazette integrations (same sphere as API Provider
+  above):
+  - Querido Diário API - evaluated: municipal-gazette-only, confirmed to
+    have zero coverage of the Rio Doce basin municipalities this project
+    needs, and out of scope for DOU by design (see Known Limitations).
+    Could still be worth revisiting for other, already-covered
+    municipalities if the project's scope broadens
+  - DOU / `in.gov.br` - evaluated: the public search
+    (`in.gov.br/consulta`) is bot-protected; INLabs
+    (`inlabs.in.gov.br`) is the identified legitimate path (free
+    registration, daily full-text XML) but needs a new Provider shape
+    (see Known Limitations)
+  - Municipal diários oficiais for the specific Rio Doce basin cities not
+    covered by Querido Diário - not yet investigated; likely means
+    per-municipality HTML sources (same pattern as every other source
+    today) or a shared state-level consortium platform if one covers
+    multiple relevant cities at once
 
 ---
 
 ## Version 3
 
-- PDF Provider
-- API Provider
 - PostgreSQL Output
 - Scheduling - in-process (`APScheduler`) done this cycle, ahead of
   schedule (see Web Application / Development Status); an OS-level
@@ -1110,40 +1119,13 @@ later version rather than retrofitted onto the JSON files.
   ever needed - not planned unless the "one person monitors the
   machine directly" assumption stops holding
 - Incremental monitoring
-
----
-
-## Version 4
-
 - AI Summaries
 - AI Classification
 - Entity Recognition
 - Sentiment Analysis
 - Similar publication detection
-
----
-
-## Future Integrations
-
-- Querido Diário API - evaluated, not integrated: municipal-gazette-only,
-  confirmed to have zero coverage of the Rio Doce basin municipalities
-  this project needs, and out of scope for DOU by design (see Known
-  Limitations). Could still be worth revisiting for other, already-covered
-  municipalities if the project's scope broadens
-- DOU / `in.gov.br` - evaluated, not integrated: the public search
-  (`in.gov.br/consulta`) is bot-protected; INLabs
-  (`inlabs.in.gov.br`) is the identified legitimate path (free
-  registration, daily full-text XML) but needs a new Provider shape (see
-  Known Limitations)
-- Municipal diários oficiais for the specific Rio Doce basin cities not
-  covered by Querido Diário - not yet investigated; likely means
-  per-municipality HTML sources (same pattern as every other source
-  today) or a shared state-level consortium platform if one covers
-  multiple relevant cities at once
-- Government APIs (general)
-- PostgreSQL
-- AI providers
-- Vector databases
+- Vector databases (supporting AI providers/similar-publication detection
+  above)
 
 ---
 
