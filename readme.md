@@ -6,7 +6,7 @@
 
 # Overview
 
-Radar Gualaxo is a monitoring application designed to collect information from multiple sources through a modular pipeline architecture. It ships with three interchangeable interfaces driving the exact same `core/` Pipeline: a Flask-based web interface (`interface_web/`, the current v1 target - single server process, reachable from any browser on the network), and two desktop interfaces (`interface_qt/`, PySide6; `interface/`, Tkinter, kept as a fallback).
+Radar Gualaxo is a monitoring application designed to collect information from multiple sources through a modular pipeline architecture. It ships with three interchangeable interfaces driving the exact same `core/` Pipeline: a Flask-based web interface (`interface_web/`, the current v1 target - single server process, reachable from any browser on the network), a desktop interface (`interface_qt/`, PySide6), and a legacy Tkinter interface (`legacy/interface/`, kept as a fallback).
 
 Although the first use case is monitoring topics related to the **Rio Doce Agreement**, the project was designed to be completely domain-agnostic.
 
@@ -206,11 +206,10 @@ the web interface instead, use `python -m interface_web.app` explicitly
   specific sources without touching `sources.json`), calendar-based date
   pickers, a background-thread pipeline run (see below) and a status-bar
   progress bar during a run.
-- `interface/` — the original Tkinter interface. Still present and still
-  fully functional (`python -c "from interface.app import start; start()"`),
-  kept as a fallback since this project has no version control to revert to
-  if the Qt interface needs to be rolled back. Not deleted; a deliberate
-  decision left for the project owner, not made unilaterally.
+- `legacy/interface/` — the original Tkinter interface. Still present and
+  still functional (`python -c "from legacy.interface.app import start; start()"`),
+  kept as a fallback for rollback safety. Not deleted; a deliberate decision
+  left for the project owner, not made unilaterally.
 
 `MonitoringController.run_monitor()` (PySide6 version) runs the Pipeline on
 a background `QThread` (`interface_qt/monitoring_worker.py`) instead of
@@ -641,7 +640,7 @@ Source's category - see Sources/Publication above) when the keyword has
 none. Since `keywords.json` currently has no per-keyword categories, every
 clipping section header today is effectively driven by Source category.
 
-Implemented in four places kept in sync: `interface/tabs/clipping.py`
+Implemented in four places kept in sync: `legacy/interface/tabs/clipping.py`
 (Tkinter), `interface_qt/clipping_tab.py` (PySide6), `outputs/whatsapp.py`
 (the `Output` used by a headless/CLI run), and `interface_web/app.py`'s
 `/clipping` route (web).
@@ -775,20 +774,6 @@ c_monitor/
 │   ├── json.py
 │   └── whatsapp.py
 │
-├── interface/                   (Tkinter - fallback, kept for rollback safety)
-│   ├── app.py
-│   ├── main_window.py
-│   ├── menu.py
-│   ├── statusbar.py
-│   ├── source_dialog.py
-│   ├── controllers/
-│   │   └── monitoring_controller.py
-│   └── tabs/
-│       ├── configuration.py
-│       ├── results.py
-│       ├── clipping.py
-│       └── logs.py
-│
 ├── interface_qt/                (PySide6 - main.py's default entry point)
 │   ├── app.py
 │   ├── main_window.py
@@ -811,21 +796,37 @@ c_monitor/
 │       ├── app.js
 │       └── style.css
 │
-├── prototypes/                  (throwaway UI comparisons, not wired to the app)
-│   ├── sample_data.py
-│   ├── results_customtkinter.py
-│   └── results_pyside6.py
-│
 ├── wppsender/                    (standalone Selenium tool, not wired to the
 │   │                              Pipeline/interfaces - run manually)
 │   ├── send_clipping.py          (rebuilds the clipping text from
 │   │                              output/results.json, sends it to one
 │   │                              specific WhatsApp group)
-│   ├── requirements.txt          (selenium, pyperclip - separate from the
-│   │                              main app's requirements.txt)
-│   ├── main.py                   (older, unrelated mass-send automation -
-│   │                              kept but not used by send_clipping.py)
-│   └── envio_funcoes.py          (older, unrelated - same as above)
+│   └── requirements.txt          (selenium, pyperclip - separate from the
+│                                  main app's requirements.txt)
+│
+├── legacy/                       (not wired into the app, not imported by
+│   │                              anything outside itself - kept for
+│   │                              rollback/reference only)
+│   ├── interface/                (original Tkinter desktop app)
+│   │   ├── app.py
+│   │   ├── main_window.py
+│   │   ├── menu.py
+│   │   ├── statusbar.py
+│   │   ├── source_dialog.py
+│   │   ├── controllers/
+│   │   │   └── monitoring_controller.py
+│   │   └── tabs/
+│   │       ├── configuration.py
+│   │       ├── results.py
+│   │       ├── clipping.py
+│   │       └── logs.py
+│   ├── prototypes/               (throwaway UI comparisons, never wired to the app)
+│   │   ├── sample_data.py
+│   │   ├── results_customtkinter.py
+│   │   └── results_pyside6.py
+│   └── wppsender_old/            (older, unrelated mass-send automation -
+│       ├── main.py                kept but not used by wppsender/send_clipping.py)
+│       └── envio_funcoes.py
 │
 ├── comparative.txt              (extraction/keyword-matching validation log
 │                                  against real-world reference clippings)
@@ -875,8 +876,8 @@ The core pipeline should never need modification when adding new Providers.
 - CSV Output
 - JSON Output
 - WhatsApp clipping Output
-- Tkinter desktop interface (`interface/`) - kept as fallback, no longer
-  the default entry point
+- Tkinter desktop interface (`legacy/interface/`) - kept as fallback, no
+  longer the default entry point
 - PySide6 desktop interface (`interface_qt/`) - now the default entry
   point; Results, Configuration, Logs and Clipping tabs implemented and
   wired to the real Pipeline, with a background-thread pipeline run and a
@@ -922,8 +923,8 @@ The core pipeline should never need modification when adding new Providers.
   of the Pipeline/interfaces) that rebuilds the clipping text from
   `output/results.json` and sends it to one specific WhatsApp group by
   pasting into WhatsApp Web's own compose box, reusing the browser-
-  automation mechanics from an older, unrelated mass-send tool that also
-  lives in `wppsender/` (`main.py`, `envio_funcoes.py` - Postgres
+  automation mechanics from an older, unrelated mass-send tool, moved to
+  `legacy/wppsender_old/` (`main.py`, `envio_funcoes.py` - Postgres
   registration, DOCX report generation, per-contact batching, none of
   which `send_clipping.py` needs or uses)
 - A "📲 Enviar pro WhatsApp" button on the web Clipping tab

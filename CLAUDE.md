@@ -4,21 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Radar Gualaxo is a Windows desktop app (Tkinter) that monitors RSS/HTML sources for keywords and produces reports (JSON/CSV/WhatsApp clipping text). It's a personal/early-stage project (Portuguese comments and debug prints are mixed into the English codebase) built around a strict pipeline architecture: **collection is independent from processing**.
+Radar Gualaxo monitors RSS/HTML sources for keywords and produces reports (JSON/CSV/WhatsApp clipping text). It's a personal/early-stage project (Portuguese comments and debug prints are mixed into the English codebase) built around a strict pipeline architecture: **collection is independent from processing**. See `readme.md` for full detail; this file is the condensed version for day-to-day edits.
+
+It ships three interchangeable interfaces driving the same `core/` Pipeline:
+
+- `interface_web/` — Flask + Jinja2, **the primary v1 target**. Run explicitly with `python -m interface_web.app` (binds `0.0.0.0:5000`). Reuses `core/`, `providers/`, `processors/`, `outputs/`, `config/` unchanged.
+- `interface_qt/` — PySide6 desktop app, still `main.py`'s default entry point (`python main.py`). Not legacy — actively maintained alongside the web interface, just not the long-term primary.
+- `legacy/interface/` — the original Tkinter desktop app. Fully legacy: kept only for rollback safety, not run or maintained day-to-day. `legacy/prototypes/` (throwaway UI comparisons) and `legacy/wppsender_old/` (an older, unrelated mass-send script superseded by `wppsender/send_clipping.py`) are legacy for the same reason — none of `legacy/` is wired into the app or imported by anything outside itself.
 
 ## Running the app
 
 ```
-python main.py
+python -m interface_web.app      # primary: web interface, http://<host>:5000
+python main.py                   # PySide6 desktop interface (default entry point, unchanged on purpose)
 ```
 
-This starts the Tkinter desktop interface (`interface/app.py` → `MainWindow`). There is no CLI monitoring mode currently wired up — `main()` in `main.py` builds a pipeline but is dead code; the actual entry point is `start()` from `interface.app`, called unconditionally in `if __name__ == "__main__"`.
+There is no CLI/headless monitoring mode wired up — `main()` in `main.py` builds a pipeline but is dead code.
 
-There is no `requirements.txt`/`pyproject.toml` in the repo. Runtime dependencies observed in imports: `feedparser`, `requests`, `beautifulsoup4` (`bs4`). Install with:
+Install dependencies (covers core + web interface; PySide6 is commented out in `requirements.txt` since a web-only server doesn't need it):
 
 ```
-pip install feedparser requests beautifulsoup4
+pip install -r requirements.txt
 ```
+
+`wppsender/` (Selenium-based WhatsApp sender) has its own separate `wppsender/requirements.txt`.
 
 ## No build/lint/test tooling
 
@@ -63,11 +72,11 @@ Every stage is an abstract base class in `core/`, and concrete implementations l
 - `config/json_storage.py` — generic `load_json`/`save_json` against `config/data/*.json` (auto-creates `config/data/` and empty `[]` files if missing).
 - `config/sources.py`, `config/keywords.py` — CRUD wrappers over `json_storage` for `sources.json` and `keywords.json`. These store **raw dicts**, not `Source`/domain objects — conversion to `Source` objects happens later (see `MonitoringController.build_sources`).
 
-### Interface (`interface/`)
+### Interfaces
 
-Tkinter desktop app. `MainWindow` (`interface/main_window.py`) builds a `ttk.Notebook` with tabs: Configuration/Selection, Results, Logs, Clipping (`interface/tabs/*.py`), plus a menu bar and status bar.
-
-`interface/controllers/monitoring_controller.py` is the glue between the UI and the core pipeline: `MonitoringController.run_monitor()` reads selected keywords/period from the Configuration tab, loads+converts sources via `build_sources()` (dict → `Source`, skipping disabled sources), wires up a `Pipeline` in `create_pipeline()` (registering `RSSProvider`/`HTMLProvider`, `KeywordProcessor`/`SummaryProcessor`, and `JsonOutput`), runs it, and pushes results into the Results/Clipping tabs and Logs tab.
+- `interface_web/app.py` — single Flask process, server-rendered HTML (no JSON API/SPA split). Tabs: Busca (run the pipeline), Resultados (sortable table + Excel export), Clipping (WhatsApp-formatted text, copy/download/send), Configuração (keyword/source CRUD), Orquestração (unattended scheduled runs via an in-process `APScheduler`, persisted to `config/data/schedule.json` / `config/schedule.py`). Job state (progress/log/results) is kept in an in-memory `JOBS` dict keyed by a per-browser-session cookie, so concurrent users each get their own run. A background `threading.Thread` runs `Pipeline.run()`; the page polls `/status`.
+- `interface_qt/` — PySide6. `MonitoringController` mirrors the same public API shape the old Tkinter tabs had, runs the Pipeline on a background `QThread` (`monitoring_worker.py`).
+- `legacy/interface/` — original Tkinter app. `MainWindow` (`legacy/interface/main_window.py`) builds a `ttk.Notebook` with tabs: Configuration/Selection, Results, Logs, Clipping. `legacy/interface/controllers/monitoring_controller.py` is the glue between that UI and the core pipeline. Kept for rollback safety only — don't build on this, extend `interface_web/` or `interface_qt/` instead.
 
 ## Conventions to preserve
 
