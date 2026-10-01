@@ -11,6 +11,7 @@ from urllib.parse import urldefrag, urljoin
 from bs4 import BeautifulSoup
 
 from .filters import (
+    is_non_content_url,
     is_valid_url,
     looks_like_article,
     same_domain,
@@ -64,6 +65,9 @@ class LinkDiscovery:
             absolute, _fragment = urldefrag(absolute)
 
             if not is_valid_url(absolute):
+                continue
+
+            if is_non_content_url(absolute):
                 continue
 
             if not same_domain(absolute, base_url):

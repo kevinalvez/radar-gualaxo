@@ -234,6 +234,82 @@ STATIC_REFERENCE_URL_MARKERS = {
 }
 
 
+# Site utility/institutional pages that are never news, whatever keyword
+# their header/footer happens to contain (e.g. a city hall's "Hino e
+# Bandeira" page matching "Mariana" just from the site's own name).
+# Matched as whole URL words like STATIC_REFERENCE_URL_MARKERS, so
+# "/m9auth/login" is caught too (IGNORED_PATHS only checks the start of
+# the path).
+UTILITY_URL_MARKERS = {
+    "login",
+    "logout",
+    "cadastro",
+    "assine",
+    "newsletter",
+    "privacidade",
+    "politica-de-privacidade",
+    "politica-de-cookies",
+    "cookies",
+    "termos",
+    "termos-de-uso",
+    "termo-de-uso",
+    "politica-de-privacidade-e-termo-de-uso",
+    "politica-anticorrupcao",
+    "sobre",
+    "sobre-nos",
+    "quem-somos",
+    "expediente",
+    "anuncie",
+    "publicidade",
+    "seja-um-colunista",
+    "fale-conosco",
+    "contato",
+    "contatos",
+    "trabalhe-conosco",
+    "acessibilidade",
+    # Common fixed pages of Brazilian city hall portals.
+    "hino-e-bandeira",
+    "telefones-uteis",
+    "dados-demograficos",
+    "nota-fiscal-eletronica",
+    "portal-do-contribuinte",
+    "todos-distritos",
+}
+
+# "/page/124/", "/pagina/3" - pagination of a listing, never an article.
+PAGINATION_PATTERN = re.compile(r"/(page|pagina)/\d+(/|$)", re.IGNORECASE)
+
+# A single, hyphen-free, purely alphabetic path segment ("/esportes",
+# "/cidades", "/historico", "/secretarias") is a site section or fixed
+# page, not a slugified headline.
+SECTION_PATH_PATTERN = re.compile(r"/[a-zà-ú]+/?", re.IGNORECASE)
+
+
+def is_non_content_url(url: str) -> bool:
+    """
+    Returns True if a discovered link can be skipped outright: the site
+    root, pagination, a section page or a utility/institutional page
+    (see UTILITY_URL_MARKERS). Unlike is_listing_path(), which only
+    lowers a link's crawl priority, these are never downloaded.
+    """
+
+    parsed = urlparse(url)
+    path = parsed.path
+
+    if path in ("", "/"):
+        return True
+
+    if PAGINATION_PATTERN.search(path):
+        return True
+
+    if not parsed.query and SECTION_PATH_PATTERN.fullmatch(path):
+        return True
+
+    words = _URL_WORD_SPLIT.split(url.lower())
+
+    return any(word in UTILITY_URL_MARKERS for word in words)
+
+
 def looks_like_static_reference(url: str) -> bool:
     """
     Returns True if the URL's own shape marks it as an inherently

@@ -131,10 +131,19 @@ class HTMLProvider(Provider):
             if "text/html" not in content_type:
                 return None
 
-            response.encoding = response.apparent_encoding
+            # Charset declared in the HTTP header -> trust it. Otherwise hand
+            # BeautifulSoup the raw bytes so it reads the page's own
+            # <meta charset> (apparent_encoding guessed wrong on some
+            # sites, e.g. CAPTA -> "organizaĂ§Ăľes").
+            if "charset=" in content_type.lower():
+
+                return BeautifulSoup(
+                    response.text,
+                    "html.parser",
+                )
 
             return BeautifulSoup(
-                response.text,
+                response.content,
                 "html.parser",
             )
 
@@ -252,6 +261,12 @@ class HTMLProvider(Provider):
             source,
         )
 
+        # WordPress archive (category/tag listing) pages - "Arquivos
+        # Guia BHAZ", "Meio Ambiente Arquivos - Portal Agro2" - slip past
+        # the extractor's listing check on some themes.
+        if self.ARCHIVE_TITLE_PATTERN.search(title):
+            return None
+
         # Prefer the page's own category metadata; fall back to the
         # source's configured category (e.g. the topic tag assigned
         # when the source was registered) when the page doesn't
@@ -283,7 +298,43 @@ class HTMLProvider(Provider):
 
     # ------------------------------------------------------------------
 
+    ARCHIVE_TITLE_PATTERN = re.compile(
+        r"^Arquivos\s|\sArquivos(\s*[-–|»]|$)"
+    )
+
     def _extract_title(
+
+        self,
+
+        soup,
+
+        source,
+
+    ):
+
+        title = self._extract_meta_title(soup, source)
+
+        # Some sites cut their own og:title/<title> at a fixed length
+        # (O Brasilianista: 60 chars, "...no mercado brasile") while the
+        # <h1> keeps the full headline - prefer the <h1> when it's that
+        # same headline, just longer.
+        h1 = soup.find("h1")
+
+        if h1:
+
+            headline = h1.get_text(" ", strip=True)
+            prefix = title.rstrip(" .…")
+
+            if (
+                prefix
+                and len(headline) > len(prefix)
+                and headline.startswith(prefix)
+            ):
+                return headline
+
+        return title
+
+    def _extract_meta_title(
 
         self,
 
@@ -691,7 +742,12 @@ class HTMLProvider(Provider):
                 "content"
             )
 
-            if value:
+            # WordPress' default "Uncategorized" says nothing - let the
+            # caller fall back to the source's own configured category.
+            if value and value.strip().lower() not in (
+                "uncategorized",
+                "sem categoria",
+            ):
                 return value.strip()
 
         return None

@@ -85,13 +85,23 @@ class WhatsAppOutput(Output):
 
         categories = {}
 
+        # One entry per link: a publication matching several keywords
+        # (or the same URL collected by more than one source) would
+        # otherwise be listed once per keyword.
+        seen_urls = set()
+
 
         for processed in publications:
 
             publication = processed.publication
 
+            if publication.url in seen_urls:
+                continue
 
-            for result in processed.keyword_results():
+
+            for result in processed.keyword_results()[:1]:
+
+                seen_urls.add(publication.url)
 
                 category = (
                     result.metadata.get("category")
