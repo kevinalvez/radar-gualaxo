@@ -1,43 +1,42 @@
 """
 config/schedule.py
 
-Orchestration (background-run) configuration: how often the monitor
-should run unattended, at what time (time, "HH:MM"), which search period
-each run should use ("period" - same options as the Busca tab: "24h",
-"7_days", "30_days", "custom" with explicit start_date/end_date -
-"DD/MM/YYYY" strings, chosen independently of how often it runs), and
-which keywords/sources that unattended run should use - a selection kept
-independent from whatever's checked in the Busca tab for a one-off run.
+Orchestration configuration - Postgres-backed - decides WHICH keywords,
+sources and search period an unattended run should use, kept independent
+from whatever's selected in the Busca/Resultados tabs for a one-off run.
 
 Note on "custom" + a recurring schedule: a fixed start_date/end_date
 applies to *every* future automatic run, not a rolling window - if the
 periodicity is "every 2 days" but the period is a fixed custom range,
 every run searches that same historical range again. That's what was
-asked for; it's just worth knowing going in, since it doesn't behave
-like "24h"/"7_days"/"30_days" do (those already always mean "relative to
+asked for; it's just worth knowing going in, since it doesn't behave like
+"24h"/"7_days"/"30_days" do (those already always mean "relative to
 whenever this particular run happens").
 
 Two mutually exclusive periodicity modes (picked via "mode"):
     "interval" - every interval_days days
     "weekdays" - on specific days of the week (weekdays), every week
 
-weekdays uses APScheduler's own day_of_week codes directly
-("mon".."sun") so config/schedule.py -> CronTrigger needs no translation
-step - see interface_web/app.py's _reschedule_orchestration().
+WHEN a scheduled run actually fires is no longer decided by this module -
+that moved to GitHub Actions' own cron
+(.github/workflows/orquestracao.yml). "mode"/"interval_days"/"weekdays"/
+"time" are kept here only so the Agendamento tab's existing fields still
+have somewhere to live; scripts/run_scheduled.py (what the GitHub Actions
+workflow actually runs) only reads "period"/"start_date"/"end_date"/
+"keywords"/"sources" - the WHAT, not the WHEN.
 
-Centered on one JSON file (config/data/schedule.json), same as
-sources.json/keywords.json, specifically so this can be the single
-source of truth if orchestration settings ever get edited from more than
-one machine.
-
-This module only persists the setting - interface_web/app.py's
-APScheduler is what actually reads it and fires runs.
+Stored as a single row (id = 1) in the schedule table - same "one JSON
+object" shape config/data/schedule.json used to hold, so this can stay
+the single source of truth even if orchestration settings get edited
+from more than one place.
 """
 
-from config.json_storage import load_json, save_json
+from __future__ import annotations
 
+from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
-FILE = "schedule.json"
+from config.db import get_connection
 
 DEFAULT = {
     "mode": "interval",
@@ -52,16 +51,58 @@ DEFAULT = {
 }
 
 
-def load_schedule():
+def load_schedule() -> dict:
 
-    data = load_json(FILE)
+    with get_connection() as conn:
+        with conn.cursor(row_factory=dict_row) as cur:
 
-    if not isinstance(data, dict):
+            cur.execute(
+                "SELECT mode, interval_days, weekdays, time, period, "
+                "start_date, end_date, keywords, sources "
+                "FROM schedule WHERE id = 1"
+            )
+
+            row = cur.fetchone()
+
+    if row is None:
         return dict(DEFAULT)
 
-    return {**DEFAULT, **data}
+    return {**DEFAULT, **row}
 
 
-def save_schedule(schedule: dict):
+def save_schedule(schedule: dict) -> None:
 
-    save_json(FILE, schedule)
+    merged = {**DEFAULT, **schedule}
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+
+            cur.execute(
+                """
+                INSERT INTO schedule
+                    (id, mode, interval_days, weekdays, time, period, start_date, end_date, keywords, sources)
+                VALUES
+                    (1, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (id) DO UPDATE SET
+                    mode = EXCLUDED.mode,
+                    interval_days = EXCLUDED.interval_days,
+                    weekdays = EXCLUDED.weekdays,
+                    time = EXCLUDED.time,
+                    period = EXCLUDED.period,
+                    start_date = EXCLUDED.start_date,
+                    end_date = EXCLUDED.end_date,
+                    keywords = EXCLUDED.keywords,
+                    sources = EXCLUDED.sources
+                """,
+                (
+                    merged["mode"],
+                    merged["interval_days"],
+                    Jsonb(merged["weekdays"]),
+                    merged["time"],
+                    merged["period"],
+                    merged["start_date"],
+                    merged["end_date"],
+                    Jsonb(merged["keywords"]),
+                    Jsonb(merged["sources"]),
+                ),
+            )

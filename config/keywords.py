@@ -1,87 +1,71 @@
 """
 config/keywords.py
 
-Keyword configuration manager.
+Keyword configuration manager - Postgres-backed.
 
-Responsible for loading, saving and managing keyword profiles.
+Keywords are stored as a flat list of plain strings (unquoted keywords do
+AND-of-tokens matching, "quoted phrases" do substring matching - see
+processors/keyword.py) - same shape config/data/keywords.json used to
+hold, matching KeywordProcessor's actual expectations. Public function
+signatures are unchanged from the JSON-backed version.
 """
 
-from config.json_storage import (
-    load_json,
-    save_json
-)
+from __future__ import annotations
+
+from config.db import get_connection
 
 
-FILE = "keywords.json"
+def load_keywords() -> list[str]:
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+
+            cur.execute("SELECT value FROM keywords ORDER BY value")
+
+            return [row[0] for row in cur.fetchall()]
 
 
-def load_keywords():
+def save_keywords(keywords: list[str]) -> None:
 
-    return load_json(
-        FILE
-    )
+    with get_connection() as conn:
+        with conn.cursor() as cur:
 
+            cur.execute("DELETE FROM keywords")
 
-def save_keywords(
-    keywords
-):
-
-    save_json(
-        FILE,
-        keywords
-    )
+            cur.executemany(
+                "INSERT INTO keywords (value) VALUES (%s) ON CONFLICT DO NOTHING",
+                [(keyword,) for keyword in keywords],
+            )
 
 
-def add_keyword(
-    keyword: dict
-):
+def add_keyword(keyword: str) -> None:
 
-    keywords = load_keywords()
+    with get_connection() as conn:
+        with conn.cursor() as cur:
 
-    if keyword not in keywords:
-
-        keywords.append(
-            keyword
-        )
-
-        save_keywords(
-            keywords
-        )
+            cur.execute(
+                "INSERT INTO keywords (value) VALUES (%s) ON CONFLICT DO NOTHING",
+                (keyword,),
+            )
 
 
-def remove_keyword(
-    keyword_name: str
-):
+def remove_keyword(keyword_name: str) -> None:
 
-    keywords = load_keywords()
+    with get_connection() as conn:
+        with conn.cursor() as cur:
 
-    keywords = [
-        item
-        for item in keywords
-        if item != keyword_name
-    ]
-
-    save_keywords(
-        keywords
-    )
+            cur.execute(
+                "DELETE FROM keywords WHERE value = %s",
+                (keyword_name,),
+            )
 
 
-def update_keyword(
-    old_name,
-    new_keyword
-):
+def update_keyword(old_name, new_keyword) -> None:
 
-    keywords = load_keywords()
+    with get_connection() as conn:
+        with conn.cursor() as cur:
 
-    for index, item in enumerate(keywords):
-
-        if item == old_name:
-
-            keywords[index] = new_keyword
-
-            break
-
-
-    save_keywords(
-        keywords
-    )
+            cur.execute(
+                "UPDATE keywords SET value = %s WHERE value = %s",
+                (new_keyword, old_name),
+            )

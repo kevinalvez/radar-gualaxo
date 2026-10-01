@@ -6,6 +6,10 @@ __pycache__/
 venv/
 env/
 
+# Segredos locais (DATABASE_URL, Green API) - ver .env.example
+.env
+.streamlit/secrets.toml
+
 # IDE
 .vscode/
 .idea/

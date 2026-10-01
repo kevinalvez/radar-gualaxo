@@ -42,7 +42,7 @@ class WhatsAppOutput(Output):
 
         self._ensure_directory()
 
-        content = self._build_message(
+        content = self.build_message(
             processed_publications
         )
 
@@ -56,10 +56,16 @@ class WhatsAppOutput(Output):
 
     # -------------------------------------------------------------
 
-    def _build_message(
+    def build_message(
         self,
         publications,
     ):
+        """
+        Builds the WhatsApp-formatted clipping text without writing it
+        anywhere - public so callers that only need the text (the
+        Streamlit interface, scripts/run_scheduled.py sending via Green
+        API) can reuse this instead of duplicating the formatting.
+        """
 
         today = datetime.now()
 

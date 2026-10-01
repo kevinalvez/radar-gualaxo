@@ -1,0 +1,29 @@
+name: Orquestração
+
+on:
+  schedule:
+    # 09:00 horário de Brasília (UTC-3) = 12:00 UTC. Esse cron é a única
+    # fonte de verdade sobre QUANDO roda - QUAIS keywords/fontes/período
+    # usar continua vindo do Postgres (tabela schedule, editada pela aba
+    # Agendamento do app Streamlit), lido por scripts/run_scheduled.py.
+    - cron: "0 12 * * *"
+  workflow_dispatch: {} # permite disparar manualmente pela aba Actions do GitHub
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install -r requirements.txt
+
+      - run: python -m scripts.run_scheduled
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GREEN_API_ID_INSTANCE: ${{ secrets.GREEN_API_ID_INSTANCE }}
+          GREEN_API_TOKEN: ${{ secrets.GREEN_API_TOKEN }}
+          GREEN_API_CHAT_ID: ${{ secrets.GREEN_API_CHAT_ID }}
