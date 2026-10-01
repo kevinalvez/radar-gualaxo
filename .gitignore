@@ -33,3 +33,6 @@ wppsender/chrome_profile/
 # live config.
 config/data/*_backup*.json
 config/data/*_apagar*.json
+
+# Credenciais locais temporárias do banco - nunca commitar
+credenciais.json

@@ -160,7 +160,7 @@
         "description": "Fundo Nacional de Assistência Social"
     },
     {
-        "name": "Agência Brasil",
+        "name": "Agência Brasil – Meio Ambiente",
         "provider": "html",
         "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-08/",
         "enabled": true,
@@ -384,7 +384,7 @@
         "description": ""
     },
     {
-        "name": "Século Diário",
+        "name": "Século Diário – Saúde",
         "provider": "html",
         "url": "https://www.seculodiario.com.br/saude/",
         "enabled": true,
@@ -480,7 +480,7 @@
         "description": ""
     },
     {
-        "name": "Século Diário",
+        "name": "Século Diário – Cidades",
         "provider": "html",
         "url": "https://www.seculodiario.com.br/cidades/",
         "enabled": true,
@@ -488,7 +488,7 @@
         "description": ""
     },
     {
-        "name": "Blog do Pedlowski",
+        "name": "Blog do Pedlowski – 07/08",
         "provider": "html",
         "url": "https://blogdopedlowski.com/2026/08/07/",
         "enabled": true,

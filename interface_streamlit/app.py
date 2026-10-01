@@ -20,18 +20,27 @@ whether this app, scripts/run_scheduled.py (GitHub Actions) or a plain
 from __future__ import annotations
 
 import os
+import sys
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 import streamlit as st
 
-try:
-    _secrets = st.secrets
-except Exception:
-    _secrets = {}
+# `streamlit run interface_streamlit/app.py` only puts this file's own
+# folder on sys.path, not the repo root - without this, config/, core/,
+# providers/ etc. aren't importable (ModuleNotFoundError on Streamlit Cloud).
+_ROOT = str(Path(__file__).resolve().parent.parent)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
-for _key in ("DATABASE_URL", "GREEN_API_ID_INSTANCE", "GREEN_API_TOKEN", "GREEN_API_CHAT_ID"):
-    if _key in _secrets and _key not in os.environ:
-        os.environ[_key] = str(_secrets[_key])
+# st.secrets is lazy - a missing secrets.toml only raises on first key
+# access, so the whole loop has to be inside the try (falls back to .env).
+try:
+    for _key in ("DATABASE_URL", "GREEN_API_ID_INSTANCE", "GREEN_API_TOKEN", "GREEN_API_CHAT_ID"):
+        if _key in st.secrets and _key not in os.environ:
+            os.environ[_key] = str(st.secrets[_key])
+except Exception:
+    pass
 
 from config.keywords import add_keyword, load_keywords, remove_keyword
 from config.schedule import load_schedule, save_schedule
