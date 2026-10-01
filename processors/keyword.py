@@ -77,13 +77,13 @@ class KeywordProcessor(Processor):
 
         for paragraph in paragraphs:
 
-            paragraph_lower = paragraph.lower()
-
             for keyword_config in self.keywords:
 
                 keyword = keyword_config["keyword"]
 
-                if not self._match_keyword(keyword, paragraph_lower):
+                # Original casing is passed on purpose - see
+                # _match_proper_noun.
+                if not self._match_keyword(keyword, paragraph):
                     continue
 
                 results.append(
@@ -125,16 +125,35 @@ class KeywordProcessor(Processor):
         if not keyword:
             return False
 
+        original_text = text
+
         text = text.lower()
 
         if (
             keyword.startswith('"')
             and keyword.endswith('"')
         ):
-            expression = keyword[1:-1].lower()
-            return expression in text
+            expression = keyword[1:-1]
+
+            # Capitalized phrase = proper noun: "Rio Doce" (the river)
+            # must not match "cágado de rio doce" (any freshwater river).
+            # Only an all-lowercase occurrence is rejected, since the
+            # press often writes "barragem de Fundão" in lowercase-start.
+            if expression != expression.lower():
+
+                pattern = re.compile(re.escape(expression), re.IGNORECASE)
+
+                return any(
+                    match.group() != match.group().lower()
+                    for match in pattern.finditer(original_text)
+                )
+
+            return expression.lower() in text
 
         keyword_words = self._tokenize(keyword)
+
+        if len(keyword_words) == 1 and keyword[0].isupper():
+            return self._match_proper_noun(keyword, original_text)
         text_words = set(self._tokenize(text))
 
         return all(
@@ -142,6 +161,40 @@ class KeywordProcessor(Processor):
             for word in keyword_words
         )
 
+
+    # ------------------------------------------------------------------
+
+    # A capitalized word right after the match ("Mariana Furtado",
+    # "Thiago Augusto Vale Lauria") - all-caps acronyms like "MG" don't
+    # count, so "Mariana MG" still matches.
+    _NEXT_NAME_PATTERN = re.compile(r"\s+[A-ZÀ-Ý][a-zà-ÿ]+")
+
+    def _match_proper_noun(
+        self,
+        keyword: str,
+        text: str,
+    ) -> bool:
+        """
+        Single capitalized keyword (a place/company: "Mariana", "Vale").
+        An occurrence immediately followed by another capitalized word
+        is part of a person's name, not the place/company, so it's
+        skipped - "Suplente: Mariana Furtado Guimarães" doesn't match,
+        "Prefeitura de Mariana" or "Mariana recebe..." does.
+        """
+
+        pattern = re.compile(
+            rf"\b{re.escape(keyword)}\b",
+            re.IGNORECASE,
+        )
+
+        for match in pattern.finditer(text):
+
+            if self._NEXT_NAME_PATTERN.match(text, match.end()):
+                continue
+
+            return True
+
+        return False
 
     # ------------------------------------------------------------------
 

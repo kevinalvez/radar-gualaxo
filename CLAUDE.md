@@ -72,7 +72,7 @@ Every stage is an abstract base class in `core/`, and concrete implementations l
 
 ### Processors (`processors/`)
 
-- `processors/keyword.py` — `KeywordProcessor`: takes a list of keyword configs (`{keyword, enabled, category, emoji}` or plain strings), splits publication content into paragraphs, and matches each keyword per paragraph. Quoted keywords (`"exact phrase"`) do substring match; unquoted keywords do AND-of-tokens match via `_tokenize`. One `Result` per keyword match per paragraph.
+- `processors/keyword.py` — `KeywordProcessor`: takes a list of keyword configs (`{keyword, enabled, category, emoji}` or plain strings), splits publication content into paragraphs, and matches each keyword per paragraph. Quoted keywords (`"exact phrase"`) do substring match; unquoted keywords do AND-of-tokens match via `_tokenize`. Capitalization in the keyword marks a proper noun: a capitalized quoted phrase (`"Rio Doce"`) ignores all-lowercase occurrences ("água de rio doce"), and a single capitalized unquoted word (`Mariana`, `Vale`) ignores occurrences followed by another capitalized word, i.e. a person's name ("Mariana Furtado"). One `Result` per keyword match per paragraph.
 - `processors/summary.py` — `SummaryProcessor`: simple extractive summarizer (first relevant sentences), not AI-based.
 
 ### Outputs (`outputs/`)
